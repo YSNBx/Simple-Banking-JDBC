@@ -48,7 +48,7 @@ public class LoggedInMenu implements MenuInterface {
             System.out.println("\nBye!");
             System.exit(0);
         } else {
-            System.out.println("\nError, wrong input!");
+            System.out.println("\nError, wrong input! Please select from given options.");
         }
     }
 
@@ -61,11 +61,11 @@ public class LoggedInMenu implements MenuInterface {
     }
 
     public void addIncome() {
-        System.out.println("\nEnter income: ");
+        System.out.println("\nEnter amount: ");
         int balance = Integer.parseInt(scanner.nextLine());
 
         this.bankAccount.increaseBalance(balance);
-        System.out.println("Income was added!");
+        System.out.println("Specified amount was added!");
 
         JDBC.updateBalance(this.bankAccount.getCardNumber(), this.bankAccount.getBalance());
     }
@@ -82,7 +82,7 @@ public class LoggedInMenu implements MenuInterface {
                 System.out.println("Such a card does not exist.");
             }
         } else {
-            System.out.println("Probably you made a mistake in the card number. Please try again!");
+            System.out.println("You have made an error, impossible number. Please try again!");
         }
     }
 

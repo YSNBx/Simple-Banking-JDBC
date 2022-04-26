@@ -39,7 +39,7 @@ public class MainMenu implements MenuInterface {
         } else if (choice.equals(MainMenuChoices.LOGIN.getChoice())) {
             logIntoAccount();
         } else {
-            System.out.println("\nError, wrong input!");
+            System.out.println("\nError, wrong input! Please select from given options.");
         }
     }
 
