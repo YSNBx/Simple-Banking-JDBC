@@ -1,12 +1,14 @@
 package JDBCDatabase;
 
+import AccountManagement.BankAccount;
+import AccountManagement.BankAccountCollection;
 import org.sqlite.SQLiteDataSource;
 import java.sql.*;
 
 public class JDBC {
     private static int ID_COUNTER = 1;
 
-    public static void initializeDatabase(String url) {
+    public static void initializeDatabase(String url, BankAccountCollection bankAccounts) {
         SQLiteDataSource dataSource = new SQLiteDataSource();
         dataSource.setUrl(url);
 
@@ -14,6 +16,7 @@ public class JDBC {
             if (con.isValid(5)) {
                 System.out.println("Connection to local Database established!\n");
                 JDBC.createTable(con, dataSource);
+                JDBC.importBankAccounts(con, dataSource, bankAccounts);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -27,6 +30,26 @@ public class JDBC {
                     "number VARCHAR," +
                     "pin VARCHAR," +
                     "balance INTEGER DEFAULT 0)");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void importBankAccounts(Connection con, SQLiteDataSource dataSource, BankAccountCollection bankAccounts) {
+        String getAccounts = "SELECT * FROM card";
+
+        try (Connection connection = dataSource.getConnection()) {
+            try (PreparedStatement balancePreparedStatement = connection.prepareStatement(getAccounts)) {
+                ResultSet rs = balancePreparedStatement.executeQuery();
+                while (rs.next()) {
+                    String cardNumber = rs.getString("number");
+                    String pinNumber = rs.getString("pin");
+                    int balance = rs.getInt("balance");
+                    bankAccounts.addBankAccountToCollection(new BankAccount(cardNumber, pinNumber, balance));
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -53,7 +76,7 @@ public class JDBC {
         JDBC.ID_COUNTER++;
     }
 
-    public static void showBalance(String cardNumber) {
+    public static int showBalance(String cardNumber) {
         SQLiteDataSource dataSource = new SQLiteDataSource();
         dataSource.setUrl("jdbc:sqlite:card.s3db");
 
@@ -64,7 +87,7 @@ public class JDBC {
                 balancePreparedStatement.setString(1, cardNumber);
                 ResultSet rs = balancePreparedStatement.executeQuery();
                 while (rs.next()) {
-                    System.out.println("\nBalance: " + rs.getInt("balance"));
+                    return rs.getInt("balance");
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -72,7 +95,7 @@ public class JDBC {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
+        return -1;
     }
 
     public static void updateBalance(String cardNumber, int balance) {
@@ -86,6 +109,24 @@ public class JDBC {
                 balancePreparedStatement.setInt(1, balance);
                 balancePreparedStatement.setString(2, cardNumber);
                 balancePreparedStatement.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void closeAccount(String cardNumber) {
+        SQLiteDataSource dataSource = new SQLiteDataSource();
+        dataSource.setUrl("jdbc:sqlite:card.s3db");
+
+        String closeAccount = "DELETE FROM card WHERE number = ?";
+
+        try (Connection connection = dataSource.getConnection()) {
+            try (PreparedStatement closePreparedStatement = connection.prepareStatement(closeAccount)) {
+                closePreparedStatement.setString(1, cardNumber);
+                closePreparedStatement.executeUpdate();
             } catch (SQLException e) {
                 e.printStackTrace();
             }

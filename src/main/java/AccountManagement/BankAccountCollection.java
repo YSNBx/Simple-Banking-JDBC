@@ -1,5 +1,7 @@
 package AccountManagement;
 
+import JDBCDatabase.JDBC;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,6 +68,11 @@ public class BankAccountCollection {
     private void shuffleBalance(BankAccount firstAccount, BankAccount secondAccount, int amount) {
         firstAccount.decreaseBalance(amount);
         secondAccount.increaseBalance(amount);
+
+        JDBC.updateBalance(firstAccount.getCardNumber(), firstAccount.getBalance());
+        JDBC.updateBalance(secondAccount.getCardNumber(), secondAccount.getBalance());
+
+        System.out.println("\nTransfer from " + firstAccount.getCardNumber() + " to " + secondAccount.getCardNumber() + " complete!");
     }
 
     public void closeAccount(BankAccount bankAccount) {

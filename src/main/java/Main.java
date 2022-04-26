@@ -5,10 +5,11 @@ import JDBCDatabase.JDBC;
 
 public class Main {
     public static void main(String[] args) {
-        JDBC.initializeDatabase(args[0] + args[1]);
+        BankAccountCollection bankAccounts = new BankAccountCollection();
+        JDBC.initializeDatabase("jdbc:sqlite:card.s3db", bankAccounts);
 
         MenuController controller = new MenuController();
-        MainMenu basicMenu = new MainMenu(new BankAccountCollection(), controller);
+        MainMenu basicMenu = new MainMenu(bankAccounts, controller);
 
         controller.setMenuInterface(basicMenu);
         controller.execute();

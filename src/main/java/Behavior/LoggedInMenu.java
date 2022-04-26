@@ -43,7 +43,7 @@ public class LoggedInMenu implements MenuInterface {
         } else if (choice.equals(LoggedInMenuChoices.DO_TRANSFER.getChoice())) {
             doTransfer();
         } else if (choice.equals(LoggedInMenuChoices.CLOSE_ACCOUNT.getChoice())) {
-            closeAccount();
+            closeAccountAndBackToMainMenu();
         } else if (choice.equals(LoggedInMenuChoices.EXIT_PROGRAM.getChoice())) {
             System.out.println("\nBye!");
             System.exit(0);
@@ -53,9 +53,7 @@ public class LoggedInMenu implements MenuInterface {
     }
 
     private void showBalance() {
-        System.out.println(this.bankAccount.getBalance());
-        //Update Database
-        //JDBCDatabase.JDBC.showBalance(this.bankAccount.getCardNumber());
+        System.out.println("\nBalance: $" + JDBC.showBalance(this.bankAccount.getCardNumber()));
     }
 
     public void printChoices() {
@@ -72,24 +70,19 @@ public class LoggedInMenu implements MenuInterface {
         JDBC.updateBalance(this.bankAccount.getCardNumber(), this.bankAccount.getBalance());
     }
 
-    /*
-        UPDATE DATABASE
-    */
-
     public void doTransfer() {
-
         System.out.println("\nTransfer\nEnter card number: ");
         String cardNumber = scanner.nextLine();
 
-        if (this.bankAccounts.searchByCardNumber(cardNumber) != null) {
-            if (this.checkCardNumberLuhns(cardNumber)) {
+        if (this.checkCardNumberLuhns(cardNumber)) {
+            if (this.bankAccounts.searchByCardNumber(cardNumber) != null) {
                 System.out.println("Enter how much money you want to transfer: ");
                 this.bankAccounts.transferMoney(this.bankAccount, cardNumber, Integer.parseInt(scanner.nextLine()));
             } else {
-                System.out.println("You probably made a mistake in the card number. Please try again!");
+                System.out.println("Such a card does not exist.");
             }
         } else {
-            System.out.println("Such a card does not exist.");
+            System.out.println("Probably you made a mistake in the card number. Please try again!");
         }
     }
 
@@ -97,13 +90,17 @@ public class LoggedInMenu implements MenuInterface {
         return this.bankAccount.checkCardValidity(cardNumber);
     }
 
-    /*
-        UPDATE DATABASE
-    */
 
-    public void closeAccount() {
+    public void closeAccountAndBackToMainMenu() {
+        JDBC.closeAccount(this.bankAccount.getCardNumber());
+
         this.bankAccounts.closeAccount(this.bankAccount);
         System.out.println("\nThis account has been closed!\n");
+
+        this.backToMainMenu();
+    }
+
+    public void backToMainMenu() {
         this.controller.setMenuInterface(new MainMenu(this.bankAccounts, this.controller));
         this.controller.execute();
     }

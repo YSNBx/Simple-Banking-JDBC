@@ -13,6 +13,12 @@ public class BankAccount {
         this.balance = 0;
     }
 
+    public BankAccount(String cardNumber, String pinNumber, int balance) {
+        this.cardNumber = cardNumber;
+        this.pinNumber = pinNumber;
+        this.balance = balance;
+    }
+
     private String createNewCardNumber() {
         String cardNumber = "400000" + (((long) Math.floor(Math.random() * 9_000_000_000L) + 1_000_000_000L) + "");
 
@@ -100,3 +106,4 @@ public class BankAccount {
                 && this.balance == tmp.balance;
     }
 }
+
